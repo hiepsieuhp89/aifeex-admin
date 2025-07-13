@@ -373,8 +373,8 @@ const StaffsPermissions = () => {
                         Không kết quả
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, textAlign: "center" }}>
-                        Không tìm thấy vai trò nào. Bạn có thể thêm vai trò mới bằng cách nhấn vào nút "Thêm vai trò
-                        mới".
+                        Không tìm thấy vai trò nào. Bạn có thể thêm vai trò mới bằng cách nhấn vào nút &quot;Thêm vai trò
+                        mới&quot;.
                       </Typography>
                     </Box>
                   </TableCell>

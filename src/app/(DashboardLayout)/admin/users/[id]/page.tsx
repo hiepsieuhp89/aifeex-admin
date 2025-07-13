@@ -440,7 +440,7 @@ function UserDetailPage() {
 
   const generateRating = (value: number) => {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex gap-1 items-center">
         {[...Array(5)].map((_, index) => (
           <IconStar
             key={index}
@@ -737,7 +737,7 @@ function UserDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="flex items-center justify-center p-6 py-12">
+      <Box className="flex justify-center items-center p-6 py-12">
         <CircularProgress className="text-main-golden-orange" />
       </Box>
     );
@@ -766,7 +766,7 @@ function UserDetailPage() {
 
   return (
     <div className="p-6">
-      <Box className="flex items-center justify-between mb-4">
+      <Box className="flex justify-between items-center mb-4">
         <Button
           variant="text"
           startIcon={<IconArrowLeft size={18} />}
@@ -906,11 +906,12 @@ function UserDetailPage() {
                     <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                       {formData.logoUrl && (
                         <Box sx={{ position: 'relative', width: 100, height: 100 }}>
-                          <img
-                            draggable={false}
+                          <Image
                             src={formData.logoUrl}
                             alt="User Avatar"
-                            style={{ width: 100, height: 100, objectFit: 'contain' }}
+                            width={100}
+                            height={100}
+                            style={{objectFit:"contain"}}
                             className="rounded-[4px] border"
                           />
                           <IconButton
@@ -957,10 +958,10 @@ function UserDetailPage() {
 
               {/* Thông tin cửa hàng */}
               {userData?.data.role === "shop" &&
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center">
                   <Typography variant="h6" className="mt-6 font-medium">Thông tin cửa hàng</Typography>
-                  <div className="flex items-center gap-4 px-4 py-2 border rounded-md bg-gray-50">
-                    <div className="flex items-center gap-2">
+                  <div className="flex gap-4 items-center px-4 py-2 bg-gray-50 rounded-md border">
+                    <div className="flex gap-2 items-center">
                       <Typography variant="body2" color={formData.shopStatus === "PENDING" ? "error" : "primary"}>
                         {formData.shopStatus === "PENDING" ? "Chờ duyệt" : "Đã duyệt"}
                       </Typography>
@@ -1106,8 +1107,8 @@ function UserDetailPage() {
                         <Image
                           src={formData.logoUrl}
                           alt="Logo cửa hàng"
-                          fill
-                          sizes="(max-width: 128px) 100vw, 128px"
+                          width={128}
+                          height={128}
                           className="object-contain rounded"
                         />
                       </div>
@@ -1373,12 +1374,14 @@ function UserDetailPage() {
                   >
                     {Array.isArray(banksData?.data) && banksData?.data.map((bank: IBank) => (
                       <MenuItem key={bank.id} value={bank.code} className="!p-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex gap-2 items-center">
                           {bank.logo_url && (
-                            <img
+                            <Image
                               src={bank.logo_url}
                               alt={bank.name}
-                              className="flex-shrink-0 object-contain w-5 h-5"
+                              width={20}
+                              height={20}
+                              className="object-contain flex-shrink-0"
                             />
                           )}
                           <span>{bank.name}</span>
@@ -1552,15 +1555,17 @@ function UserDetailPage() {
                 <div>
                   <Typography variant="subtitle1" className="!mb-2">Ảnh mặt sau</Typography>
                   {imagePreviewBack || formData.idCardBackImage ? (
-                    <div className="relative flex-1 w-full overflow-hidden border border-gray-600 rounded">
-                      <img
+                    <div className="overflow-hidden relative flex-1 w-full rounded border border-gray-600">
+                      <Image
                         src={imagePreviewBack || formData.idCardBackImage}
                         alt="Ảnh mặt sau"
+                        width={100}
+                        height={100}
                         className="object-cover w-full h-full cursor-pointer"
                         onClick={() => handleOpenImagePreview(imagePreviewBack || formData.idCardBackImage, "Ảnh mặt sau CCCD")}
                       />
                       <IconButton
-                        className="absolute z-10 bg-white/80 hover:bg-white bottom-2 right-2"
+                        className="absolute right-2 bottom-2 z-10 bg-white/80 hover:bg-white"
                         size="small"
                         onClick={() => handleOpenImagePreview(imagePreviewBack || formData.idCardBackImage, "Ảnh mặt sau CCCD")}
                       >
@@ -1570,7 +1575,7 @@ function UserDetailPage() {
                         <button
                           type="button"
                           onClick={() => removeImage('back')}
-                          className="absolute p-1 transition-colors bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full transition-colors hover:bg-red-600"
                         >
                           <IconX size={16} color="white" />
                         </button>
@@ -1579,7 +1584,7 @@ function UserDetailPage() {
                   ) : (
                     isEditing ? (
                       <label className="flex flex-col items-center justify-center w-full transition-colors border border-gray-500 border-dashed !rounded-lg cursor-pointer">
-                        <div className="flex flex-col items-center justify-center py-4">
+                        <div className="flex flex-col justify-center items-center py-4">
                           <IconUpload size={24} className="mb-2 text-gray-400" />
                           <p className="text-sm text-gray-400">Upload ảnh mặt sau</p>
                         </div>
@@ -1595,15 +1600,17 @@ function UserDetailPage() {
                 <div>
                   <Typography variant="subtitle1" className="!mb-2">Ảnh mặt trước</Typography>
                   {imagePreviewFront || formData.idCardFrontImage ? (
-                    <div className="relative flex-1 w-full overflow-hidden border border-gray-600 rounded">
-                      <img
+                    <div className="overflow-hidden relative flex-1 w-full rounded border border-gray-600">
+                      <Image
                         src={imagePreviewFront || formData.idCardFrontImage}
                         alt="Ảnh mặt trước"
+                        width={100}
+                        height={100}
                         className="object-cover w-full h-full cursor-pointer"
                         onClick={() => handleOpenImagePreview(imagePreviewFront || formData.idCardFrontImage, "Ảnh mặt trước CCCD")}
                       />
                       <IconButton
-                        className="absolute z-10 bg-white/80 hover:bg-white bottom-2 right-2"
+                        className="absolute right-2 bottom-2 z-10 bg-white/80 hover:bg-white"
                         size="small"
                         onClick={() => handleOpenImagePreview(imagePreviewFront || formData.idCardFrontImage, "Ảnh mặt trước CCCD")}
                       >
@@ -1613,7 +1620,7 @@ function UserDetailPage() {
                         <button
                           type="button"
                           onClick={() => removeImage('front')}
-                          className="absolute p-1 transition-colors bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                          className="absolute top-2 right-2 p-1 bg-red-500 rounded-full transition-colors hover:bg-red-600"
                         >
                           <IconX size={16} color="white" />
                         </button>
@@ -1622,7 +1629,7 @@ function UserDetailPage() {
                   ) : (
                     isEditing ? (
                       <label className="flex flex-col items-center justify-center w-full transition-colors border border-gray-500 border-dashed !rounded-lg cursor-pointer">
-                        <div className="flex flex-col items-center justify-center py-4">
+                        <div className="flex flex-col justify-center items-center py-4">
                           <IconUpload size={24} className="mb-2 text-gray-400" />
                           <p className="text-sm text-gray-400">Upload ảnh mặt trước</p>
                         </div>
@@ -1637,7 +1644,7 @@ function UserDetailPage() {
                 </div>
               </div>
               {isEditing && (
-                <Box className="flex justify-end gap-4">
+                <Box className="flex gap-4 justify-end">
                   <Button
                     type="button"
                     variant="outlined"
@@ -1967,7 +1974,7 @@ function UserDetailPage() {
             disabled={deleteUserMutation.isPending}
           >
             {deleteUserMutation.isPending ? (
-              <div className="flex items-center gap-2 text-white">
+              <div className="flex gap-2 items-center text-white">
                 <CircularProgress size={16} className="text-white" />
                 Đang xóa...
               </div>
@@ -2010,7 +2017,7 @@ function UserDetailPage() {
             disabled={updateUserMutation.isPending}
           >
             {updateUserMutation.isPending ? (
-              <div className="flex items-center gap-2 text-white">
+              <div className="flex gap-2 items-center text-white">
                 <CircularProgress size={16} className="text-white" />
                 Đang xử lý...
               </div>
@@ -2050,7 +2057,7 @@ function UserDetailPage() {
             disabled={updateUserMutation.isPending}
           >
             {updateUserMutation.isPending ? (
-              <div className="flex items-center gap-2 text-white">
+              <div className="flex gap-2 items-center text-white">
                 <CircularProgress size={16} className="text-white" />
                 Đang xử lý...
               </div>
@@ -2070,7 +2077,7 @@ function UserDetailPage() {
           className: "!rounded-[6px] shadow-xl",
         }}
       >
-        <DialogTitle fontSize={18} className="flex items-center justify-between">
+        <DialogTitle fontSize={18} className="flex justify-between items-center">
           {previewImageTitle}
           <IconButton onClick={() => setImagePreviewDialogOpen(false)} size="small">
             <IconX size={18} />
@@ -2078,9 +2085,11 @@ function UserDetailPage() {
         </DialogTitle>
         <DialogContent className="min-w-[300px] sm:min-w-[500px] lg:min-w-[800px]">
           <div className="flex justify-center w-full">
-            <img
+            <Image
               src={previewImageSrc}
               alt={previewImageTitle}
+              width={800}
+              height={800}
               className="max-w-full max-h-[80vh] object-contain"
             />
           </div>

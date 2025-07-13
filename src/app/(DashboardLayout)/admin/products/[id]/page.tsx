@@ -38,6 +38,7 @@ import { useGetAllCategories } from "@/hooks/category"
 import { useUploadImage } from "@/hooks/image"
 import { useDeleteProduct, useGetProductById, useUpdateProduct } from "@/hooks/product"
 import { ICreateProduct } from "@/interface/request/product"
+import Image from "next/image"
 
 // Sử dụng dynamic import để tải ReactQuill chỉ ở phía client
 const ReactQuill = dynamic(() => import('react-quill'), { 
@@ -306,7 +307,7 @@ function ProductDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="flex items-center justify-center p-6 py-12">
+      <Box className="flex justify-center items-center p-6 py-12">
         <CircularProgress className="text-main-golden-orange" />
       </Box>
     )
@@ -335,7 +336,7 @@ function ProductDetailPage() {
 
   return (
     <div className="p-6">
-      <Box className="flex items-center justify-between mb-4">
+      <Box className="flex justify-between items-center mb-4">
         <Button
           variant="text"
           startIcon={<IconArrowLeft size={18} />}
@@ -509,7 +510,7 @@ function ProductDetailPage() {
                   'list', 'bullet',
                   'link', 'image'
                 ]}
-                className="border border-gray-300 rounded"
+                className="rounded border border-gray-300"
               />
             </Box>
 
@@ -522,16 +523,17 @@ function ProductDetailPage() {
                 <Box >
                   {imagePreviews.map((preview, index) => (
                     <Box key={index}>
-                      <Box className="relative overflow-hidden border border-gray-600 rounded aspect-square">
-                        <img
+                      <Box className="overflow-hidden relative rounded border border-gray-600 aspect-square">
+                        <Image
                           src={preview}
                           alt={`Product preview ${index}`}
-                          className="object-cover w-full h-full"
+                          fill
+                          style={{objectFit:"cover"}}
                         />
                         {isEditing && (
                           <IconButton
                             onClick={() => removeImage(index)}
-                            className="absolute p-1 transition-colors bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                            className="absolute top-2 right-2 p-1 bg-red-500 rounded-full transition-colors hover:bg-red-600"
                             size="small"
                           >
                             <IconX size={16} color="white" />
@@ -544,7 +546,7 @@ function ProductDetailPage() {
                   {isEditing && (
                     <Box>
                       <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-md border-gray-300 h-full min-h-[150px] cursor-pointer">
-                        <Box className="flex flex-col items-center justify-center p-4">
+                        <Box className="flex flex-col justify-center items-center p-4">
                           <IconPlus size={24} className="mb-2 text-gray-400" />
                           <Typography className="text-sm text-gray-400">
                             Thêm ảnh
@@ -563,7 +565,7 @@ function ProductDetailPage() {
                 </Box>
               ) : (
                 <label className={`flex flex-col items-center justify-center w-full h-32 transition-colors border border-gray-500 border-dashed !rounded-lg ${isEditing ? 'cursor-pointer' : 'cursor-default'}`}>
-                  <div className="flex flex-col items-center justify-center py-4">
+                  <div className="flex flex-col justify-center items-center py-4">
                     <IconUpload size={24} className="mb-2 text-gray-400" />
                     <p className="text-sm text-gray-400">Upload hình ảnh</p>
                   </div>

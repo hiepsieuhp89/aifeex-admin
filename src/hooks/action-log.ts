@@ -4,11 +4,9 @@ import {
   type UseQueryResult,
 } from "@tanstack/react-query"
 
-// Query keys
 const ACTION_LOGS_KEY = "action-logs"
 const USER_ACTION_LOGS_KEY = "user-action-logs"
 
-// Get user action logs
 export const useGetUserActionLogs = (
   userId: string, 
   params?: any
@@ -20,7 +18,6 @@ export const useGetUserActionLogs = (
   })
 }
 
-// Get all action logs (admin only)
 export const useGetAllActionLogs = (params?: any): UseQueryResult<any> => {
   return useQuery({
     queryKey: [ACTION_LOGS_KEY, params],

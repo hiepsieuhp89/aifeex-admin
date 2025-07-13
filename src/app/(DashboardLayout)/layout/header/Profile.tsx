@@ -15,7 +15,7 @@ import {
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
 import cookies from 'js-cookie';
 import { useRouter } from "next/navigation";
-import { useGetProfileData } from "@/hooks/authentication";
+import { useGetAdminProfile } from "@/hooks/admin-auth";
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
@@ -30,7 +30,7 @@ const Profile = () => {
     cookies.remove('accessToken');
     router.push('/sign-in');
   };
-  const { profileData } = useGetProfileData()
+  const { data: profileData } = useGetAdminProfile()
 
   return (
     <Box>
@@ -55,7 +55,7 @@ const Profile = () => {
             height: 35,
           }}
         />
-        <span className="pl-1 text-xs text-white ">{profileData?.data?.username}</span>
+        <span className="pl-1 text-xs text-white">{profileData?.username}</span>
       </IconButton>
       <Menu
         id="msgs-menu"

@@ -143,7 +143,7 @@ const AdminPosPage = () => {
     debounce((value: string) => {
       setSearchShop(value);
     }, 500),
-    []
+    [setSearchShop]
   );
 
   // Add debounced user search function
@@ -151,7 +151,7 @@ const AdminPosPage = () => {
     debounce((value: string) => {
       setSearchUser(value);
     }, 500),
-    []
+    [setSearchUser]
   );
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -486,7 +486,7 @@ const AdminPosPage = () => {
 
   return (
     <Box component="section" className={styles.storehouse}>
-      <Box className="px-4 py-4 mx-auto ">
+      <Box className="px-4 py-4 mx-auto">
         <Box className="flex flex-col gap-4 md:flex-row">
           <Box className="flex flex-col md:flex-1">
             <Box sx={{ mb: 4 }}>
@@ -517,7 +517,7 @@ const AdminPosPage = () => {
                 </Typography>
               </Box>
 
-              <Box className="flex justify-between w-full gap-2">
+              <Box className="flex gap-2 justify-between w-full">
                 <FormControl fullWidth>
                   <Autocomplete
                     options={shopsData?.data.data || []}
@@ -708,7 +708,7 @@ const AdminPosPage = () => {
                         }}
                       >
                         <IconMail
-                          className="w-4 h-4 mr-2"
+                          className="mr-2 w-4 h-4"
                           style={{ color: "#3F6AD8", flexShrink: 0 }}
                         />
                         <Box component="span" sx={{ fontWeight: 500 }}>
@@ -729,7 +729,7 @@ const AdminPosPage = () => {
                         }}
                       >
                         <IconPhone
-                          className="w-4 h-4 mr-2"
+                          className="mr-2 w-4 h-4"
                           style={{ color: "#3F6AD8", flexShrink: 0 }}
                         />
                         <Box component="span" sx={{ fontWeight: 500 }}>
@@ -750,7 +750,7 @@ const AdminPosPage = () => {
                         }}
                       >
                         <IconMapPin
-                          className="w-4 h-4 mr-2"
+                          className="mr-2 w-4 h-4"
                           style={{ color: "#3F6AD8", flexShrink: 0 }}
                         />
                         <Box component="span" sx={{ fontWeight: 500 }}>
@@ -773,7 +773,7 @@ const AdminPosPage = () => {
                         }}
                       >
                         <IconCalendar
-                          className="w-4 h-4 mr-2"
+                          className="mr-2 w-4 h-4"
                           style={{ color: "#FCAF17", flexShrink: 0 }}
                         />
                         <Box component="span" sx={{ fontWeight: 500 }}>
@@ -873,9 +873,9 @@ const AdminPosPage = () => {
                   </Box>
                   {viewMode === "grid" ? (
                     <>
-                      <Box className="grid grid-cols-1 gap-4 overflow-y-auto md:grid-cols-2 lg:grid-cols-3">
+                      <Box className="grid overflow-y-auto grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {productsData?.data?.data?.length === 0 ? (
-                          <Box className="flex items-center justify-center h-full col-span-3">
+                          <Box className="flex col-span-3 justify-center items-center h-full">
                             <Empty
                               image={Empty.PRESENTED_IMAGE_SIMPLE}
                               description={"Shop chưa có sản phẩm."}
@@ -1181,7 +1181,7 @@ const AdminPosPage = () => {
                   Vui lòng chọn khách ảo trước khi đặt hàng !
                 </Typography>
               </Box>
-              <Box className="flex items-center gap-2 mb-3">
+              <Box className="flex gap-2 items-center mb-3">
                 <FormControl fullWidth>
                   <Autocomplete
                     options={validUsers?.data.data || []}
@@ -1302,7 +1302,7 @@ const AdminPosPage = () => {
                                 padding: "16px 0px",
                               }}
                             >
-                              <Box className="flex items-start w-full gap-2">
+                              <Box className="flex gap-2 items-start w-full">
                                 <Box
                                   sx={{
                                     display: "flex",
@@ -1779,7 +1779,7 @@ const AdminPosPage = () => {
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <IconUser
-                    className="w-4 h-4 mr-2"
+                    className="mr-2 w-4 h-4"
                     style={{ color: "#3F6AD8" }}
                   />
                   <span className="mr-1 font-bold">Khách hàng: </span>
@@ -1787,7 +1787,7 @@ const AdminPosPage = () => {
                 </Typography>
                 <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <IconMail
-                    className="w-4 h-4 mr-2"
+                    className="mr-2 w-4 h-4"
                     style={{ color: "#3F6AD8" }}
                   />
                   <span className="mr-1 font-bold">Email: </span>
@@ -1795,7 +1795,7 @@ const AdminPosPage = () => {
                 </Typography>
                 <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <IconPhone
-                    className="w-4 h-4 mr-2"
+                    className="mr-2 w-4 h-4"
                     style={{ color: "#3F6AD8" }}
                   />
                   <span className="mr-1 font-bold">Số điện thoại:</span>
@@ -1803,7 +1803,7 @@ const AdminPosPage = () => {
                 </Typography>
                 <Typography sx={{ display: "flex", alignItems: "center" }}>
                   <IconMapPin
-                    className="w-4 h-4 mr-2"
+                    className="mr-2 w-4 h-4"
                     style={{ color: "#3F6AD8" }}
                   />
                   <span className="mr-1 font-bold">Địa chỉ:</span>
@@ -1817,7 +1817,7 @@ const AdminPosPage = () => {
                   }}
                 >
                   <IconCalendar
-                    className="w-4 h-4 mr-2"
+                    className="mr-2 w-4 h-4"
                     style={{ color: "#3F6AD8" }}
                   />
                   <span className="mr-1 font-bold">Thời gian đặt hàng:</span>

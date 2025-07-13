@@ -45,6 +45,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import { Autocomplete } from "@mui/material";
 import { debounce } from "lodash";
+import Image from "next/image";
 
 import {
   useCreateProductReview,
@@ -609,10 +610,12 @@ const ProductReviewsPage = () => {
                   {reviewData.imagePreviews.map((preview, index) => (
                     <Box key={index}>
                       <Box className="relative rounded aspect-square">
-                        <img
+                        <Image
                           src={preview}
                           alt={`Preview ${index}`}
-                          className="object-cover w-full h-full rounded"
+                          fill
+                          style={{objectFit:"cover"}}
+                          className="rounded"
                         />
                         <IconButton
                           onClick={() => removeImage(index)}

@@ -28,6 +28,7 @@ import { message } from "antd"
 
 import { useDeleteSellerPackage, useGetSellerPackageById, useUpdateSellerPackage } from "@/hooks/seller-package"
 import { useUploadImage } from "@/hooks/image"
+import Image from "next/image"
 
 function SellerPackageDetailPage() {
   const router = useRouter()
@@ -153,7 +154,7 @@ function SellerPackageDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="flex items-center justify-center p-6 py-12">
+      <Box className="flex justify-center items-center p-6 py-12">
         <CircularProgress className="text-main-golden-orange" />
       </Box>
     )
@@ -184,7 +185,7 @@ function SellerPackageDetailPage() {
 
   return (
     <div className="p-6">
-      <Box className="flex items-center justify-between mb-4">
+      <Box className="flex justify-between items-center mb-4">
         <Button
           variant="text"
           startIcon={<IconArrowLeft size={18} />}
@@ -250,7 +251,7 @@ function SellerPackageDetailPage() {
               disabled={!isEditing}
             />
           </div>
-          <div className="grid items-stretch grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 items-stretch md:grid-cols-2">
             <div className="flex flex-col gap-6">
               <TextField
                 size="small"
@@ -303,17 +304,18 @@ function SellerPackageDetailPage() {
                 Hình ảnh gói bán hàng
               </Typography>
               {imagePreview ? (
-                <div className="relative flex-1 w-full h-32 overflow-hidden border border-gray-600 rounded">
-                  <img
+                <div className="overflow-hidden relative flex-1 w-full h-32 rounded border border-gray-600">
+                  <Image
                     src={imagePreview}
                     alt="Package preview"
-                    className="object-cover w-full h-full"
+                    fill
+                    style={{objectFit:"cover"}}
                   />
                   {isEditing && (
                     <button
                       type="button"
                       onClick={removeImage}
-                      className="absolute p-1 transition-colors bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                      className="absolute top-2 right-2 p-1 bg-red-500 rounded-full transition-colors hover:bg-red-600"
                     >
                       <IconX size={16} color="white" />
                     </button>
@@ -321,14 +323,14 @@ function SellerPackageDetailPage() {
                 </div>
               ) : (
                 <label className={`flex flex-col items-center justify-center w-full h-32 transition-colors border border-gray-500 border-dashed !rounded-lg ${isEditing ? 'cursor-pointer' : 'cursor-default'}`}>
-                  <div className="flex flex-col items-center justify-center py-4">
+                  <div className="flex flex-col justify-center items-center py-4">
                     <IconUpload size={24} className="mb-2 text-gray-400" />
                     <p className="text-sm text-gray-400">Upload hình ảnh</p>
                   </div>
                   {isEditing && <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />}
                 </label>
               )}
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex gap-2 items-center mt-2">
                 <Typography
                   fontSize={14}
                   variant="subtitle1"
@@ -351,7 +353,7 @@ function SellerPackageDetailPage() {
             </div>
           </div>
           {isEditing && (
-            <Box className="flex justify-end gap-4">
+            <Box className="flex gap-4 justify-end">
               <Button
                 type="button"
                 variant="outlined"
@@ -374,7 +376,7 @@ function SellerPackageDetailPage() {
             </Box>
           )}
         </form>
-        <Box className="flex justify-end gap-2 mb-4">
+        <Box className="flex gap-2 justify-end mb-4">
           {!isEditing ? (
             <>
               <Button
@@ -425,7 +427,7 @@ function SellerPackageDetailPage() {
             disabled={deletePackageMutation.isPending}
           >
             {deletePackageMutation.isPending ?
-              <div className="flex items-center gap-2 text-white">
+              <div className="flex gap-2 items-center text-white">
                 <CircularProgress size={16} className="text-white" />
                 Đang xóa...
               </div> : <span className="!text-white">Xóa</span>}

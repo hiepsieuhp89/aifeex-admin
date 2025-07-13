@@ -19,6 +19,7 @@ import { useState } from "react"
 
 import { useCreateCategory, useGetAllCategories } from "@/hooks/category"
 import { useUploadImage } from "@/hooks/image"
+import Image from "next/image"
 
 // Add NestedMenuItem and buildNestedCategories from products page
 const NestedMenuItem = ({ category, level = 0 }: { category: any, level?: number }) => {
@@ -184,7 +185,7 @@ export default function CreateCategoryPage() {
 
   return (
     <div className="p-6">
-      <Box className="flex items-center justify-between mb-4">
+      <Box className="flex justify-between items-center mb-4">
         <Button
           variant="text"
           startIcon={<IconArrowLeft size={18} />}
@@ -266,23 +267,24 @@ export default function CreateCategoryPage() {
                 Hình ảnh danh mục
               </Typography>
               {imagePreview ? (
-                <div className="relative flex-1 w-full h-32 overflow-hidden border border-gray-600 rounded">
-                  <img
+                <div className="overflow-hidden relative flex-1 w-full h-32 rounded border border-gray-600">
+                  <Image
                     src={imagePreview}
                     alt="Category preview"
-                    className="object-cover w-full h-full"
+                    fill
+                    style={{objectFit:"cover"}}
                   />
                   <button
                     type="button"
                     onClick={removeImage}
-                    className="absolute p-1 transition-colors bg-red-500 rounded-full top-2 right-2 hover:bg-red-600"
+                    className="absolute top-2 right-2 p-1 bg-red-500 rounded-full transition-colors hover:bg-red-600"
                   >
                     <IconX size={16} color="white" />
                   </button>
                 </div>
               ) : (
                 <label className="flex flex-col items-center justify-center w-full h-32 transition-colors border border-gray-500 border-dashed !rounded-lg cursor-pointer">
-                  <div className="flex flex-col items-center justify-center py-4">
+                  <div className="flex flex-col justify-center items-center py-4">
                     <IconUpload size={24} className="mb-2 text-gray-400" />
                     <p className="text-sm text-gray-400">Upload hình ảnh</p>
                   </div>
@@ -292,7 +294,7 @@ export default function CreateCategoryPage() {
             </div>
           </div>
 
-          <Box className="flex justify-end gap-4">
+          <Box className="flex gap-4 justify-end">
             <Button
               className="!normal-case"
               type="button"

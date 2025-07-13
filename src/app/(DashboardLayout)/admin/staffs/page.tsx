@@ -519,8 +519,8 @@ const StaffPage: React.FC = () => {
                         Không kết quả
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, textAlign: "center" }}>
-                        Không tìm thấy nhân viên nào. Bạn có thể thêm nhân viên mới bằng cách nhấn vào nút "Thêm nhân
-                        viên mới".
+                        Không tìm thấy nhân viên nào. Bạn có thể thêm nhân viên mới bằng cách nhấn vào nút &quot;Thêm nhân
+                        viên mới&quot;.
                       </Typography>
                     </Box>
                   </TableCell>

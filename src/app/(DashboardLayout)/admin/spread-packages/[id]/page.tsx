@@ -28,6 +28,7 @@ import { message } from "antd"
 
 import { useDeleteSpreadPackage, useGetSpreadPackageById, useUpdateSpreadPackage } from "@/hooks/spread-package"
 import { useUploadImage } from "@/hooks/image"
+import Image from "next/image"
 
 function SpreadPackageDetailPage() {
   const router = useRouter()
@@ -291,10 +292,11 @@ function SpreadPackageDetailPage() {
               </Typography>
               {imagePreview ? (
                 <div className="relative flex-1 w-full h-32 overflow-hidden border border-gray-600 rounded">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Package preview"
-                    className="object-cover w-full h-full"
+                    fill
+                    style={{objectFit:"cover"}}
                   />
                   {isEditing && (
                     <button

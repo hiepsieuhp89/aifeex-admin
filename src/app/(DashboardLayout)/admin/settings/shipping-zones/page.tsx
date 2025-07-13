@@ -372,7 +372,7 @@ const ShippingZonesPage: React.FC = () => {
                         Không kết quả
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, textAlign: "center" }}>
-                        No zones found. You can add a new zone by clicking the "Add New Zone" button above.
+                        No zones found. You can add a new zone by clicking the &quot;Add New Zone&quot; button above.
                       </Typography>
                     </Box>
                   </TableCell>

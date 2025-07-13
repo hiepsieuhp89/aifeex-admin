@@ -8,8 +8,8 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - NEXT_PUBLIC_API_URL=api-xosodinh.apibet.site
-      - NEXT_PUBLIC_API_WS=ws-xosodinh.apibet.site
+      - NEXT_PUBLIC_API_URL=aifeex-api.nu3kachi.site
+      - NEXT_PUBLIC_API_WS=ws-aifeex-api.nu3kachi.site
       - NEXT_PUBLIC_TELEGRAM_TOKEN=7823816631:AAFFOvzHiMAAn9zjc0UrZh_OYrrUvASwjGk
       - NEXT_PUBLIC_TELEGRAM_CHAT_ID=-1002386997983
       - NEXT_PUBLIC_NODE_ENV=production

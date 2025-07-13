@@ -1,7 +1,7 @@
 'use client';
 import PageContainer from '@/component/container/PageContainer';
 import DashboardCard from '@/component/shared/DashboardCard';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   Box,
@@ -45,11 +45,14 @@ import { useCreateFakeReview } from '@/hooks/fake-review';
 import { useUploadImage } from '@/hooks/image';
 import { useDeleteFakeReview } from '@/hooks/fake-review';
 import { message } from 'antd';
+import Image from 'next/image';
+import { useCreateProductReview } from '@/hooks/product-review';
+import { useDeleteProductReview } from '@/hooks/product-review';
 
 const OrderDetailPage = () => {
   const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
+  const { id } = params;
 
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<any>(null);
@@ -63,11 +66,14 @@ const OrderDetailPage = () => {
   const { mutate: createReview, isPending: isCreatingReview } = useCreateFakeReview();
   const { mutate: uploadImage, isPending: isUploading } = useUploadImage();
   const { mutate: deleteReview, isPending: isDeletingReview } = useDeleteFakeReview();
-  const fetchOrderDetail = async () => {
+  const { mutate: createProductReview, isPending: isCreatingProductReview } = useCreateProductReview();
+  const { mutate: deleteProductReview, isPending: isDeletingProductReview } = useDeleteProductReview();
+
+  const fetchOrderDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await sendGet(`/admin/orders/${id}`);
+      const response = await OrderService.getOrderDetail(id as string);
       if (response.status) {
         setOrder(response.data);
       } else {
@@ -78,13 +84,13 @@ const OrderDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     if (id) {
       fetchOrderDetail();
     }
-  }, [id]);
+  }, [id, fetchOrderDetail]);
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -925,11 +931,12 @@ const OrderDetailPage = () => {
                               <TableCell>
                                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                                   {item.shopProduct?.product?.imageUrls && item.shopProduct.product.imageUrls.length > 0 && (
-                                    <Box
-                                      component="img"
+                                    <Image
                                       src={item.shopProduct.product.imageUrls[0]}
                                       alt={item.shopProduct?.product?.name}
-                                      sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
+                                      width={60}
+                                      height={60}
+                                      style={{ objectFit: 'cover', borderRadius: 1 }}
                                     />
                                   )}
                                   <Box>
@@ -1098,13 +1105,15 @@ const OrderDetailPage = () => {
           {selectedProduct && (
             <Box>
               <Box mb={2} display="flex" alignItems="center" gap={2} className="bg-[#F5F5F5] !rounded-[4px] border p-2 overflow-hidden">
-                <img
-                  draggable={false}
-                  className="rounded-[4px]"
-                  src={selectedProduct?.shopProduct?.product?.imageUrls?.[0] || "/images/white-image.png"}
-                  alt={selectedProduct.shopProduct?.product?.name || 'Sản phẩm'}
-                  style={{ width: 80, height: 80, objectFit: 'cover' }}
-                />
+                {selectedProduct?.shopProduct?.product?.imageUrls?.[0] && (
+                  <Image
+                    src={selectedProduct?.shopProduct?.product?.imageUrls[0] || "/images/white-image.png"}
+                    alt={selectedProduct.shopProduct?.product?.name || 'Sản phẩm'}
+                    width={80}
+                    height={80}
+                    style={{ objectFit: 'cover' }}
+                  />
+                )}
                 <Box>
                   <Typography variant="h6">{selectedProduct.shopProduct?.product?.name || 'Sản phẩm'}</Typography>
                   <Typography variant="body2" color="textSecondary">
@@ -1150,12 +1159,11 @@ const OrderDetailPage = () => {
                 <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {images.map((img, index) => (
                     <Box key={index} sx={{ position: 'relative', width: 100, height: 100 }}>
-                      <img
-                        draggable={false}
-                        key={index}
+                      <Image
                         src={img}
                         alt={`Review image ${index}`}
-                        style={{ width: 100, height: 100, objectFit: 'contain' }}
+                        width={100}
+                        height={100}
                         className="rounded-[4px] border"
                       />
                       <IconButton
@@ -1177,7 +1185,7 @@ const OrderDetailPage = () => {
               </Box>
             </Box>
           )}
-          <Box className="flex justify-end gap-4 mt-6">
+          <Box className="flex gap-4 justify-end mt-6">
             <Button
               variant="outlined"
               onClick={handleCloseProductReviewDialog}>Hủy</Button>

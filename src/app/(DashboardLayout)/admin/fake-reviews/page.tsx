@@ -30,6 +30,7 @@ import { useGetAllUsers } from "@/hooks/user"
 import { useGetUserOrders, useCreateFakeReview, useDeleteFakeReview } from "@/hooks/fake-review"
 import { CircularProgress } from "@mui/material"
 import { useUploadImage } from "@/hooks/image"
+import Image from "next/image"
 
 function FakeReviewsPage() {
   const [page, setPage] = useState(1)
@@ -94,7 +95,7 @@ function FakeReviewsPage() {
       <TableCell>{user.phone}</TableCell>
       <TableCell>{[user.address, user.ward, user.district, user.city].filter(Boolean).join(', ')}</TableCell>
       <TableCell>
-        <Box className="flex items-center justify-center gap-4">
+        <Box className="flex gap-4 justify-center items-center">
           <Tooltip title="Chi tiết đơn hàng">
             <IconButton
               color="primary"
@@ -140,11 +141,13 @@ function FakeReviewsPage() {
         {items.map((item, index) => (
           <Box
             key={index} display="flex" alignItems="start" gap={2} mb={2}>
-            <img
+            <Image
               className="rounded-[4px]"
               src={item?.shopProduct?.product?.imageUrls[0] || "/images/white-image.png"}
               alt={item.productName}
-              style={{ width: 80, height: 80, objectFit: 'cover' }}
+              width={80}
+              height={80}
+              style={{ objectFit: 'cover' }}
             />
             <Box>
               <Typography
@@ -365,7 +368,7 @@ function FakeReviewsPage() {
 
   if (error) {
     return (
-      <Box className="flex flex-col items-center justify-center min-h-screen gap-2 p-8 text-center">
+      <Box className="flex flex-col gap-2 justify-center items-center p-8 min-h-screen text-center">
         <IconMoodSadDizzy size={48} className="text-gray-400" />
         <Typography variant="h6" className="mb-2 text-red-400">
           Lỗi khi tải danh sách người dùng
@@ -438,12 +441,12 @@ function FakeReviewsPage() {
           {selectedProduct && (
             <Box>
               <Box mb={2} display="flex" alignItems="center" gap={2} className="bg-[#F5F5F5] !rounded-[4px] border p-2 overflow-hidden">
-                <img
-                  draggable={false}
-                  className="rounded-[4px]"
+                <Image
                   src={selectedProduct?.shopProduct?.product?.imageUrls[0] || "/images/white-image.png"}
                   alt={selectedProduct.productName}
-                  style={{ width: 80, height: 80, objectFit: 'cover' }}
+                  width={80}
+                  height={80}
+                  style={{ objectFit: 'cover' }}
                 />
                 <Box>
                   <Typography variant="h6">{selectedProduct.productName}</Typography>
@@ -490,12 +493,11 @@ function FakeReviewsPage() {
                 <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {images.map((img, index) => (
                     <Box key={index} sx={{ position: 'relative', width: 100, height: 100 }}>
-                      <img
-                        draggable={false}
-                        key={index}
+                      <Image
                         src={img}
                         alt={`Review image ${index}`}
-                        style={{ width: 100, height: 100, objectFit: 'contain' }}
+                        width={100}
+                        height={100}
                         className="rounded-[4px] border"
                       />
                       <IconButton
@@ -541,7 +543,7 @@ function FakeReviewsPage() {
               </Box>
             </Box>
           )}
-          <Box className="flex justify-end gap-4 mt-6">
+          <Box className="flex gap-4 justify-end mt-6">
             <Button
               variant="outlined"
               onClick={handleCloseProductReviewDialog}>Hủy</Button>

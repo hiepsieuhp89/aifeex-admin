@@ -19,7 +19,7 @@ import {
   IconShoppingCart,
   IconTicket,
 } from "@tabler/icons-react"
-import { useGetProfileData } from "@/hooks/authentication";
+import { useGetAdminProfile } from "@/hooks/admin-auth";
 
 const generateUniqueId = (() => {
   const usedIds = new Set()
@@ -210,19 +210,15 @@ const Menuitems = [
   },
 ]
 
-const filterMenuItems = (items: any[], role?: string, shopName?: string) => {
-  if (role === "supper_admin") return items;
+const filterMenuItems = (items: any[], role?: string) => {
+  const userRole = role; // Use the passed role
 
-  if (role === "admin") {
-    if (shopName === "admin2") {
+  if (userRole === "super_admin") return items;
+
+  if (userRole === "admin") {
       return items.filter(item => 
         ["Quản lý người dùng", "Quản lý nạp/rút", "Thông báo"].includes(item.title)
       );
-    } else if (!shopName) {
-      return items.filter(item => 
-        ["Quản lý POS", "Quản lý cửa hàng", "Quản lý đơn hàng", "Các sản phẩm", "Quản lý đánh giá", "Thông báo", "Quản lý mã mời"].includes(item.title)
-      );
-    }
   }
 
   return items;
@@ -231,31 +227,27 @@ const filterMenuItems = (items: any[], role?: string, shopName?: string) => {
 const SidebarItems = ({ toggleMobileSidebar }: any) => {
   const pathname = usePathname();
   const pathDirect = pathname;
-  const {profileData} = useGetProfileData()
+  const { data: profileData } = useGetAdminProfile()
   
   const filteredMenuItems = filterMenuItems(
     Menuitems,
-    profileData?.data?.role,
-    profileData?.data?.shopName
+    profileData?.role,
   );
 
   return (
-    <List sx={{ pt: 0 }} className="sidebarNav" component="div">
-      {filteredMenuItems.map((item) => {
-        if (item.subheader) {
-          return <NavGroup item={item} key={item.subheader} />;
-        } else {
-          return (
-            <NavItem
-              item={item as any}
-              key={item.id}
-              pathDirect={pathDirect}
-              onClick={toggleMobileSidebar}
-            />
-          );
-        }
-      })}
-    </List>
+    <Box sx={{ px: 2 }}>
+      <List sx={{ pt: 0 }} className="sidebarNav">
+        {filteredMenuItems.map((item) => {
+          if (item.subheader) {
+            return <NavGroup item={item} key={item.subheader} />;
+          } else {
+            return (
+              <NavItem item={item} key={item.id} pathDirect={pathDirect} onClick={toggleMobileSidebar} />
+            );
+          }
+        })}
+      </List>
+    </Box>
   );
 };
 export default SidebarItems;

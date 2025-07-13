@@ -11,6 +11,7 @@ import { ICreateProduct } from '@/interface/request/product';
 import { useGetAllCategories } from "@/hooks/category";
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import styles for the editor
+import Image from "next/image"
 
 // Sử dụng dynamic import để tải ReactQuill chỉ ở phía client
 const ReactQuill = dynamic(() => import('react-quill'), {
@@ -219,8 +220,8 @@ export default function CreateProductPage() {
     <div className='flex flex-col h-full min-h-screen'>
       <Box className="py-8">
         <Box className="relative" />
-        <Box className="relative flex flex-col items-center gap-2">
-          <Box className="p-4 mb-3 rounded-full shadow-lg bg-gradient-to-r from-amber-100 to-orange-100">
+        <Box className="flex relative flex-col gap-2 items-center">
+          <Box className="p-4 mb-3 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full shadow-lg">
             <IconCubePlus size={36} className="text-main-golden-orange" />
           </Box>
           <Typography variant="h3" className="font-semibold tracking-wide text-center uppercase text-main-charcoal-blue">
@@ -229,8 +230,8 @@ export default function CreateProductPage() {
         </Box>
       </Box>
       <Box className='flex flex-col flex-1 p-6'>
-        <Paper className="flex flex-col flex-1 h-full p-6">
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1 h-full space-y-4">
+        <Paper className="flex flex-col flex-1 p-6 h-full">
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 space-y-4 h-full">
             <Box className="flex gap-6">
               {/* Left Column */}
               <Box className="w-2/3">
@@ -365,7 +366,7 @@ export default function CreateProductPage() {
                         'list', 'bullet',
                         'link', 'image'
                       ]}
-                      className="border border-gray-300 rounded"
+                      className="rounded border border-gray-300"
                     />
                   </Box>
                 </Box>
@@ -398,15 +399,16 @@ export default function CreateProductPage() {
                       <Box >
                         {imagePreviews.map((preview, index) => (
                           <Box key={index}>
-                            <Box className="relative overflow-hidden border border-gray-600 rounded aspect-square">
-                              <img
+                            <Box className="overflow-hidden relative rounded border border-gray-600 aspect-square">
+                              <Image
                                 src={preview}
                                 alt={`Product preview ${index}`}
-                                className="object-cover w-full h-full"
+                                fill
+                                style={{objectFit:"cover"}}
                               />
                               <IconButton
                                 onClick={() => removeImage(index)}
-                                className="absolute z-10 p-1 transition-colors rounded-full top-2 right-2 hover:bg-red-600"
+                                className="absolute top-2 right-2 z-10 p-1 rounded-full transition-colors hover:bg-red-600"
                                 size="small"
                               >
                                 <IconX size={16} color="white" />
@@ -415,8 +417,8 @@ export default function CreateProductPage() {
                           </Box>
                         ))}
                         <Box>
-                          <label className="flex flex-col items-center justify-center border-2 border-gray-300 border-dashed rounded-md cursor-pointer aspect-square">
-                            <Box className="flex flex-col items-center justify-center p-4">
+                          <label className="flex flex-col justify-center items-center rounded-md border-2 border-gray-300 border-dashed cursor-pointer aspect-square">
+                            <Box className="flex flex-col justify-center items-center p-4">
                               <IconPlus size={24} className="mb-2 text-gray-400" />
                               <Typography className="text-sm text-gray-400">
                                 Thêm ảnh
@@ -435,7 +437,7 @@ export default function CreateProductPage() {
                     </Box>
                   ) : (
                     <label className="flex flex-col items-center justify-center w-full h-32 transition-colors border border-gray-500 border-dashed !rounded-lg cursor-pointer">
-                      <div className="flex flex-col items-center justify-center py-4">
+                      <div className="flex flex-col justify-center items-center py-4">
                         <IconUpload size={24} className="mb-2 text-gray-400" />
                         <p className="text-sm text-gray-400">Upload hình ảnh</p>
                       </div>
@@ -446,8 +448,8 @@ export default function CreateProductPage() {
               </Box>
             </Box>
 
-            <Box className="flex flex-col items-end justify-end flex-1 gap-4">
-         <Box className="flex items-end justify-end gap-4">
+            <Box className="flex flex-col flex-1 gap-4 justify-end items-end">
+         <Box className="flex gap-4 justify-end items-end">
               <Button
                 className="!normal-case"
                 type="button"
