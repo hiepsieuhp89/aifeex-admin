@@ -2,7 +2,7 @@ export enum TransactionStatus {
   PENDING = "pending",
   COMPLETED = "completed",
   REJECTED = "rejected",
-  APPROVED = "approved"
+  APPROVED = "approved",
 }
 
 export enum TransactionType {
@@ -12,31 +12,41 @@ export enum TransactionType {
   ORDER_PAYMENT = "order_payment",
   ORDER_PROFIT = "order_profit",
   RECHARGE = "recharge",
-  WITHDRAW = "withdraw"
+  WITHDRAW = "withdraw",
+}
+
+export enum TransactionNetwork {
+  ETHEREUM = "ethereum",
+  BSC = "bsc",
+  BITCOIN = "bitcoin",
+  TRON = "tron",
 }
 
 export interface ITransactionHistoryParams {
-  page?: number
-  take?: number
-  status?: TransactionStatus
-  type?: TransactionType
-  userId?: string
+  page?: number;
+  limit?: number;
+  status?: TransactionStatus;
+  type?: TransactionType;
+  user_id?: string;
+  start_date?: string;
+  end_date?: string;
+  network?: "ethereum" | "bsc" | "bitcoin" | "tron";
 }
 
 export interface IRechargeRequest {
-  amount: number
-  bankName: string
-  bankCode: string
-  accountNumber: string
-  accountName: string
-  withdrawPassword: string
+  amount: number;
+  bankName: string;
+  bankCode: string;
+  accountNumber: string;
+  accountName: string;
+  withdrawPassword: string;
 }
 
 export interface IWithdrawRequest {
-  bankName: string
-  bankCode: string
-  accountNumber: string
-  accountName: string
-  amount: number
-  withdrawPassword: string
-} 
+  bankName: string;
+  bankCode: string;
+  accountNumber: string;
+  accountName: string;
+  amount: number;
+  withdrawPassword: string;
+}

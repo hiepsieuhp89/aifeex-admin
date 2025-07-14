@@ -1,4 +1,10 @@
-import { useMutation, type UseMutationResult, useQuery, type UseQueryResult, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  type UseMutationResult,
+  useQuery,
+  type UseQueryResult,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import {
   adminLogin,
@@ -27,13 +33,17 @@ export const useAdminLogin = (): UseMutationResult<
   return useMutation({
     mutationFn: adminLogin,
     onSuccess: (data) => {
-      Cookies.set("accessToken", data.token, { expires: 7 }); // Store token for 7 days
+      Cookies.set("accessToken", data.jwt_token, { expires: 7 }); // Store token for 7 days
       queryClient.invalidateQueries({ queryKey: [ADMIN_AUTH_KEYS.PROFILE] });
     },
   });
 };
 
-export const useAdminLogout = (): UseMutationResult<IAdminLogoutResponse, Error, void> => {
+export const useAdminLogout = (): UseMutationResult<
+  IAdminLogoutResponse,
+  Error,
+  void
+> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: adminLogout,
@@ -44,15 +54,20 @@ export const useAdminLogout = (): UseMutationResult<IAdminLogoutResponse, Error,
   });
 };
 
-export const useGetAdminProfile = (): UseQueryResult<IGetAdminProfileResponse> => {
-  return useQuery({
-    queryKey: [ADMIN_AUTH_KEYS.PROFILE],
-    queryFn: getAdminProfile,
-    enabled: !!Cookies.get("accessToken"), // Only fetch if token exists
-  });
-};
+export const useGetAdminProfile =
+  (): UseQueryResult<IGetAdminProfileResponse> => {
+    return useQuery({
+      queryKey: [ADMIN_AUTH_KEYS.PROFILE],
+      queryFn: getAdminProfile,
+      enabled: !!Cookies.get("accessToken"), // Only fetch if token exists
+    });
+  };
 
-export const useRefreshAdminToken = (): UseMutationResult<IRefreshAdminTokenResponse, Error, void> => {
+export const useRefreshAdminToken = (): UseMutationResult<
+  IRefreshAdminTokenResponse,
+  Error,
+  void
+> => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: refreshAdminToken,
@@ -60,4 +75,4 @@ export const useRefreshAdminToken = (): UseMutationResult<IRefreshAdminTokenResp
       queryClient.invalidateQueries({ queryKey: [ADMIN_AUTH_KEYS.PROFILE] });
     },
   });
-}; 
+};

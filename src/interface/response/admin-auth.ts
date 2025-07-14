@@ -16,6 +16,8 @@ export interface IAdminLoginResponse {
   admin: IAdmin;
   message: string;
   token: string;
+  jwt_token: string;
+  session_token: string;
 }
 
 export interface IAdminLogoutResponse {
@@ -30,4 +32,4 @@ export interface IRefreshAdminTokenResponse {
   additionalProp1: string;
   additionalProp2: string;
   additionalProp3: string;
-} 
+}
