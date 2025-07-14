@@ -39,6 +39,7 @@ import {
   TransactionNetwork,
 } from "@/interface/request/transaction";
 import dayjs, { Dayjs } from "dayjs";
+import { Transaction } from "@/interface/response/transaction";
 
 function formatMoney(money: string): string {
   return parseFloat(money).toLocaleString("en-US") + " USD";
@@ -84,6 +85,10 @@ function getStatusChipProps(_status: string) {
   switch (status) {
     case TransactionStatus.COMPLETED:
       return { label: "Hoàn thành", color: "success" as const };
+    case TransactionStatus.CONFIRMED:
+      return { label: "Đã xác nhận", color: "success" as const };
+    case TransactionStatus.FAILED:
+      return { label: "Thất bại", color: "error" as const };
     case TransactionStatus.PENDING:
       return { label: "Đang xử lý", color: "warning" as const };
     case TransactionStatus.APPROVED:
@@ -104,12 +109,12 @@ function WithdrawalTable() {
     isLoading,
     error,
     refetch,
-  } = useGetTransactionHistory({
+  } = useGetAdminWithdrawals({
     page,
     limit: limit,
-    type: TransactionType.WITHDRAW,
+    type: "withdrawal",
   });
-  const withdrawals = withdrawalsData?.data?.data || [];
+  const withdrawals = withdrawalsData?.transactions || [];
 
   // useEffect(() => {
   //   const intervalId = setInterval(() => {
@@ -310,13 +315,19 @@ function TransactionHistoryPage() {
         : undefined,
   });
 
-  const transactions = (transactionsData?.data?.data as any) || [];
+  const transactions = (transactionsData?.transactions as any) || [];
 
   const filteredTransactions = searchTerm
     ? transactions.filter(
-        (transaction: any) =>
-          transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          transaction.description
+        (transaction: Transaction) =>
+          transaction.id
+            .toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          transaction.user_email
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          transaction.from_address
             .toLowerCase()
             .includes(searchTerm.toLowerCase())
       )
@@ -344,10 +355,18 @@ function TransactionHistoryPage() {
     });
   };
 
-  const handleCopy = async (text: string, field: string) => {
+  const handleCopy = async ({
+    text,
+    field,
+    messageNoti,
+  }: {
+    text: string;
+    field: string;
+    messageNoti: string;
+  }) => {
     try {
       await navigator.clipboard.writeText(text);
-      message.success("Đã sao chép ID giao dịch vào clipboard!");
+      message.success(messageNoti);
     } catch (err) {
       message.error("Không thể sao chép. Vui lòng thử lại!");
     }
@@ -521,23 +540,26 @@ function TransactionHistoryPage() {
                         Số tiền
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
-                        Loại giao dịch
+                        Mạng
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
                         Trạng thái
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
-                        Mô tả
+                        Mã hash
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
                         Tên người dùng
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
+                        ID người dùng
+                      </TableCell>
+                      {/* <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
                         Email
                       </TableCell>
                       <TableCell sx={{ fontSize: "14px", fontWeight: 600 }}>
                         Số điện thoại
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   </TableHead>
                   {filteredTransactions.length > 0 && (
@@ -554,23 +576,30 @@ function TransactionHistoryPage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <span>{transaction.id}</span>
-                              <IconButton
-                                onClick={() => handleCopy(transaction.id, "id")}
-                                size="small">
-                                <IconCopy size={16} className="text-blue-500" />
-                              </IconButton>
+                              {/* <IconButton
+                                  onClick={() =>
+                                    handleCopy({
+                                      text: transaction.id,
+                                      field: "id",
+                                      messageNoti:
+                                        "Đã sao chép ID người dùng vào clipboard!",
+                                    })
+                                  }
+                                  size="small">
+                                  <IconCopy size={16} className="text-blue-500" />
+                                </IconButton> */}
                             </div>
                           </TableCell>
-                          <TableCell>{transaction.user?.email}</TableCell>
+                          <TableCell>{transaction.user_email}</TableCell>
                           <TableCell>
-                            {formatDate(transaction.createdAt)}
+                            {formatDate(transaction.timestamp)}
                           </TableCell>
                           <TableCell>
-                            {formatMoney(transaction.money)}
+                            {formatMoney(transaction.amount)}
                           </TableCell>
                           <TableCell>
                             <Chip
-                              label={getTransactionTypeLabel(transaction.type)}
+                              label={transaction.network.toUpperCase()}
                               color={
                                 transaction.type === TransactionType.WITHDRAW
                                   ? "error"
@@ -597,24 +626,49 @@ function TransactionHistoryPage() {
                               <Typography
                                 variant="body2"
                                 className="max-w-[300px] truncate"
-                                title={transaction.description}>
-                                {transaction.description}
+                                title={transaction.transaction_hash}>
+                                {transaction.transaction_hash}
                               </Typography>
                               <IconCopy
                                 size={16}
                                 className="text-gray-500 transition-opacity opacity-0 cursor-pointer hover:text-gray-700 group-hover:opacity-100"
                                 onClick={() =>
-                                  handleCopy(
-                                    transaction.description,
-                                    "description"
-                                  )
+                                  handleCopy({
+                                    text: transaction.transaction_hash,
+                                    field: "transaction_hash",
+                                    messageNoti:
+                                      "Đã sao chép mã hash vào clipboard!",
+                                  })
                                 }
                               />
                             </div>
                           </TableCell>
-                          <TableCell>{transaction.user?.fullName}</TableCell>
-                          <TableCell>{transaction.user?.email}</TableCell>
-                          <TableCell>{transaction.user?.phone}</TableCell>
+                          <TableCell>{transaction.from_address}</TableCell>
+                          <TableCell>
+                            {" "}
+                            <div className="flex items-center gap-2 group">
+                              <Typography
+                                variant="body2"
+                                className="max-w-[300px] truncate"
+                                title={transaction.transaction_hash}>
+                                {transaction.user_id}
+                              </Typography>
+                              <IconCopy
+                                size={16}
+                                className="text-gray-500 transition-opacity opacity-0 cursor-pointer hover:text-gray-700 group-hover:opacity-100"
+                                onClick={() =>
+                                  handleCopy({
+                                    text: transaction.user_id,
+                                    field: "user_id",
+                                    messageNoti:
+                                      "Đã sao chép ID người dùng vào clipboard!",
+                                  })
+                                }
+                              />
+                            </div>
+                          </TableCell>
+                          {/* <TableCell>{transaction.user?.email}</TableCell> */}
+                          {/* <TableCell>{transaction.user?.phone}</TableCell> */}
                         </TableRow>
                       ))}
                     </TableBody>
@@ -639,7 +693,7 @@ function TransactionHistoryPage() {
               <TablePagination
                 rowsPerPageOptions={[5, 8, 10, 25]}
                 component="div"
-                count={transactionsData?.data?.meta?.itemCount || 0}
+                count={transactionsData?.pagination?.total_count || 0}
                 rowsPerPage={limit}
                 page={page - 1}
                 onPageChange={handlePageChange}

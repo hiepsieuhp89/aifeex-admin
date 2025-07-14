@@ -75,7 +75,7 @@ export const ConfigTransactionEndPoint = {
   HISTORY: "/admin/transactions",
   RECHARGE: "/transaction/recharge",
   WITHDRAW: "/transaction/withdraw",
-  ADMIN_WITHDRAWALS: "/withdrawals/admin",
+  ADMIN_WITHDRAWALS: "/admin/transactions/pending",
 };
 
 export const ConfigActionLogEndPoint = {

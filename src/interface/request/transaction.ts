@@ -3,6 +3,8 @@ export enum TransactionStatus {
   COMPLETED = "completed",
   REJECTED = "rejected",
   APPROVED = "approved",
+  FAILED = "failed",
+  CONFIRMED = "confirmed",
 }
 
 export enum TransactionType {
