@@ -4,28 +4,28 @@ const nextConfig = {
   images: {
     domains: process.env.NEXT_PUBLIC_API_URL
       ? [
-          process.env.NEXT_PUBLIC_API_URL, 
-          "example.com", 
-          "picsum.photos", 
-          "m.media-amazon.com", 
-          "img2.yeshen.cc"
+          process.env.NEXT_PUBLIC_API_URL,
+          "example.com",
+          "picsum.photos",
+          "m.media-amazon.com",
+          "img2.yeshen.cc",
         ]
       : [
-          "aifeex-api.nu3kachi.site", 
-          "example.com", 
-          "picsum.photos", 
-          "m.media-amazon.com", 
-          "img2.yeshen.cc"
+          "aifeex-api.nu3kachi.site",
+          "example.com",
+          "picsum.photos",
+          "m.media-amazon.com",
+          "img2.yeshen.cc",
         ],
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
       {
-        protocol: 'http',
-        hostname: '**',
-      }
+        protocol: "http",
+        hostname: "**",
+      },
     ],
     unoptimized: true,
   },
@@ -33,14 +33,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   async rewrites() {
-    const domain =
-        process.env.NEXT_PUBLIC_API_URL || "aifeex-api.nu3kachi.site";
-        return [
+    return [
       {
-        source: "/api/:path*",
-        destination: `https://${domain}/:path*`,
+        source: '/api/v1/:path*',
+        destination: 'https://aifeex-api.nu3kachi.site/api/v1/:path*',
       },
-    ];
+    ]
   },
 };
 

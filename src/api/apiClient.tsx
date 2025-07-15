@@ -11,7 +11,7 @@ function getLocalAccessToken() {
 
 const instance = axios.create({
   timeout: 3 * 60 * 1000,
-  baseURL: `https://aifeex-api.nu3kachi.site/api/v1/`,
+  baseURL: `/api/v1/`,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

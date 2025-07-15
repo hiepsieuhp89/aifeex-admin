@@ -19,9 +19,20 @@ type FieldType = {
 };
 
 interface AdminLoginResponse {
-    admin: any;
-    message?: string;
-    token?: string;
+    admin: {
+        id: number;
+        username: string;
+        email: string;
+        full_name: string;
+        role: string;
+        is_active: boolean;
+        last_login: string;
+        created_at: string;
+        updated_at: string;
+    };
+    session_token: string;
+    jwt_token: string;
+    expires_at: string;
 }
 
 const SignInForm = () => {
@@ -42,15 +53,19 @@ const SignInForm = () => {
             setCredentials({ username: values.username, password: values.password });
 
             const response = await mutateAsync(payload);
-            const responseData = response as AdminLoginResponse;
+            const responseData = response as any;
             
-            if (responseData?.token) {
-                setCookies(responseData.token)
-                loginUser(responseData.admin, responseData.token)
+            if (responseData?.jwt_token) {
+                setCookies(responseData.jwt_token);
+                loginUser(responseData.admin, responseData.jwt_token);
                 handleSuccessMessage('Đăng nhập thành công!');
-                router.push('/')
-            } else if (responseData?.message) {
-                handleErrorMessage(responseData.message);
+                // Đảm bảo điều hướng được thực hiện sau khi set cookie và login user
+                setTimeout(() => {
+                    router.push('/');
+                    router.refresh(); // Refresh để đảm bảo state mới được cập nhật
+                }, 100);
+            } else {
+                handleErrorMessage('Đăng nhập thất bại!');
             }
         } catch (error: any) {
             handleErrorMessage(error?.response?.data?.message);

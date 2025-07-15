@@ -28,7 +28,47 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import ChatDialog from "@/components/ChatDialog"
-import { useDeleteUser, useGetAllUsers, useUpdateUser } from "@/hooks/user"
+import {
+  useGetAllUsers,
+  useUpdateUser,
+  useDeleteUser,
+  useBanUser,
+  useUnbanUser,
+} from "@/hooks/admin-users";
+import dayjs from 'dayjs';
+
+// Define User and Pagination types to match the new API
+interface User {
+  id: number;
+  account_name: string;
+  email: string;
+  role: string;
+  invite_code_id: number | null;
+  my_invite_code_id: number | null;
+  full_name?: string;
+  avatar_url?: string;
+  language?: string;
+  vip_tier?: string;
+  total_points?: number;
+  current_level?: number;
+  notification_enabled?: boolean;
+  voice_enabled?: boolean;
+  is_active?: boolean;
+  is_banned?: boolean;
+  last_login?: string;
+  login_count?: number;
+  created_at?: string;
+  updated_at?: string;
+  used_invite_code?: any;
+  phone?: string;
+  country?: string;
+}
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  total_pages: number;
+}
 
 function UsersPage() {
   const router = useRouter()
@@ -36,9 +76,9 @@ function UsersPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [userToDelete, setUserToDelete] = useState<string | null>(null)
+  const [userToDelete, setUserToDelete] = useState<number | null>(null)
   const [chatDialogOpen, setChatDialogOpen] = useState(false)
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [selectedShop, setSelectedShop] = useState<any>(null)
   const [filters, setFilters] = useState({
     order: 'DESC',
@@ -49,42 +89,52 @@ function UsersPage() {
   const updateUserMutation = useUpdateUser();
   const { data: userData, isLoading, error } = useGetAllUsers({
     page,
-    take: rowsPerPage,
+    limit: rowsPerPage,
     search: searchTerm,
-    order: filters.order as 'ASC' | 'DESC' | undefined,
-    status: filters.status || undefined,
-    role: filters.role as 'shop' | 'admin' | 'user' | undefined,
-    hasShop: filters.hasShop ? filters.hasShop === 'true' : undefined
-  })
-  const filteredUsers = userData?.data?.data || []
-  const pagination = userData?.data?.meta || {
-    page: 1,
-    take: 10,
-    itemCount: 0,
-    pageCount: 1,
-    hasPreviousPage: false,
-    hasNextPage: false
-  }
+    order: (filters.order as 'asc' | 'desc' | undefined),
+    status: filters.status || undefined
+  }) as { data: { users: User[]; pagination: Pagination } | undefined, isLoading: boolean, error: any };
+
+  // Use correct fields from API response
+  const filteredUsers: User[] = userData?.users || [];
+  const pagination = {
+    page: userData?.pagination?.page || 1,
+    take: userData?.pagination?.limit || 10,
+    itemCount: userData?.pagination?.total || 0,
+    pageCount: userData?.pagination?.total_pages || 1,
+    hasPreviousPage: (userData?.pagination?.page || 1) > 1,
+    hasNextPage: (userData?.pagination?.page || 1) < (userData?.pagination?.total_pages || 1)
+  };
   const deleteUserMutation = useDeleteUser()
+  const banUserMutation = useBanUser();
+  const unbanUserMutation = useUnbanUser();
   const { data: allUsers } = useGetAllUsers({
-    take: 1000,
-    role: "user"
+    limit: 1000
   })
-  const [balanceDialogOpen, setBalanceDialogOpen] = useState(false);
-  const [balanceActionType, setBalanceActionType] = useState<'deposit' | 'withdraw'>('deposit');
-  const [amount, setAmount] = useState('');
+
+  // Add back anchorEl and menuUserId state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuUserId, setMenuUserId] = useState<string | null>(null);
+  const [menuUserId, setMenuUserId] = useState<number | null>(null);
+
+  // Add back handleMenuOpen and handleMenuClose
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, userId: number) => {
+    setAnchorEl(event.currentTarget);
+    setMenuUserId(userId);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setMenuUserId(null);
+  };
 
   const handleCreateNew = () => {
     router.push("/admin/users/create-new")
   }
 
-  const handleView = (id: string) => {
+  const handleView = (id: number) => {
     router.push(`/admin/users/${id}`)
   }
 
-  const openDeleteDialog = (id: string) => {
+  const openDeleteDialog = (id: number) => {
     setUserToDelete(id)
     setDeleteDialogOpen(true)
   }
@@ -103,110 +153,74 @@ function UsersPage() {
     }
   }
 
-  const handleOpenChat = (userId: string) => {
-    const shop = filteredUsers.find(u => u.id === userId);
+  const handleOpenChat = (userId: number) => {
+    const shop = filteredUsers.find((u: User) => u.id === userId);
     setSelectedShop(shop);
     setSelectedUserId(userId);
     setChatDialogOpen(true);
   }
 
-  const handleBalanceDialogOpen = (userId: string, type: 'deposit' | 'withdraw') => {
-    setSelectedUserId(userId);
-    setBalanceActionType(type);
-    setBalanceDialogOpen(true);
-  };
-
-  const handleBalanceDialogClose = () => {
-    setBalanceDialogOpen(false);
-    setAmount('');
-    setSelectedUserId(null);
-  };
-
-  const handleBalanceUpdate = async () => {
-    if (!selectedUserId || !amount || isNaN(Number(amount))) {
-      message.error('Số tiền không hợp lệ');
-      return;
-    }
-
+  const handleToggleFreeze = async (userId: number) => {
     try {
-      // Fetch current user data
-      const currentUser = filteredUsers.find(user => user.id === selectedUserId);
-      if (!currentUser) {
-        message.error('Không tìm thấy thông tin người dùng');
-        return;
-      }
-
-      // Calculate new balance
-      const currentBalance = Number(currentUser.balance);
-      const amountNumber = Number(amount);
-      const newBalance = balanceActionType === 'deposit'
-        ? currentBalance + amountNumber
-        : currentBalance - amountNumber;
-
-      // Update balance
+      const user = filteredUsers.find((u: User) => u.id === userId);
+      if (!user) return;
+      const newStatus = !user.is_active;
       await updateUserMutation.mutateAsync({
-        id: selectedUserId,
+        id: userId,
         payload: {
-          balance: newBalance.toString()
-        }
+          is_active: newStatus
+        } as any // Use 'as any' if is_active is not in IUpdateUserRequest
       });
-
-      message.success(`${balanceActionType === 'deposit' ? 'Nạp' : 'Rút'} tiền thành công!`);
-      handleBalanceDialogClose();
+      message.success(newStatus ? "Đã mở khóa người dùng thành công!" : "Đã khóa người dùng thành công!");
+      handleMenuClose();
     } catch (error) {
-      message.error(`Không thể ${balanceActionType === 'deposit' ? 'nạp' : 'rút'} tiền. Vui lòng thử lại.`);
+      message.error("Không thể thay đổi trạng thái người dùng. Vui lòng thử lại.");
       console.error(error);
     }
   };
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, userId: string) => {
-    setAnchorEl(event.currentTarget);
-    setMenuUserId(userId);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setMenuUserId(null);
-  };
-
-  const handleToggleFreeze = async (userId: string) => {
+  const handleToggleBan = async (userId: number) => {
     try {
-      const user = filteredUsers.find(u => u.id === userId);
+      const user = filteredUsers.find((u: User) => u.id === userId);
       if (!user) return;
-
-      const newStatus = user.shopStatus === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
-
-      await updateUserMutation.mutateAsync({
-        id: userId,
-        payload: {
-          shopStatus: newStatus
-        }
-      });
-
-      message.success(newStatus === "SUSPENDED"
-        ? "Đã đóng băng shop thành công!"
-        : "Đã bỏ đóng băng shop thành công!");
-
+      const newStatus = !user.is_banned;
+      if (newStatus) {
+        await banUserMutation.mutateAsync({ id: userId, payload: {} });
+        message.success("Đã khóa người dùng thành công!");
+      } else {
+        await unbanUserMutation.mutateAsync(userId);
+        message.success("Đã mở khóa người dùng thành công!");
+      }
       handleMenuClose();
     } catch (error) {
-      message.error("Không thể thay đổi trạng thái shop. Vui lòng thử lại.");
+      message.error("Không thể thay đổi trạng thái người dùng. Vui lòng thử lại.");
       console.error(error);
     }
   };
 
   const columns = [
     { key: 'stt', label: 'STT' },
+    { key: 'id', label: 'ID' },
+    { key: 'account_name', label: 'Tên tài khoản' },
     { key: 'email', label: 'Email' },
-    { key: 'username', label: 'Tên đăng nhập' },
-    { key: 'fullName', label: 'Họ tên' },
-    { key: 'phone', label: 'Số điện thoại' },
-    { key: 'invitationCode', label: 'Mã mời' },
-    { key: 'role', label: 'Vai trò' },
-    { key: 'status', label: 'Trạng thái' },
+    { key: 'invite_code_id', label: 'Mã mời' },
+    { key: 'my_invite_code_id', label: 'Mã mời của tôi' },
+    { key: 'language', label: 'Ngôn ngữ' },
+    { key: 'vip_tier', label: 'VIP' },
+    { key: 'total_points', label: 'Điểm' },
+    { key: 'current_level', label: 'Cấp độ' },
+    { key: 'notification_enabled', label: 'Nhận thông báo' },
+    { key: 'voice_enabled', label: 'Voice' },
+    { key: 'is_active', label: 'Hoạt động' },
+    { key: 'is_banned', label: 'Banned' },
+    { key: 'login_count', label: 'Số lần đăng nhập' },
+    { key: 'created_at', label: 'Ngày tạo' },
+    { key: 'updated_at', label: 'Ngày cập nhật' },
+    { key: 'used_invite_code', label: 'Mã mời đã dùng' },
     { key: 'actions', label: 'Thao tác' },
   ];
 
-  const renderRow = (user: any, index: number) => (
+  const renderRow = (user: User, index: number) => (
     <TableRow
       key={user.id}
       sx={{
@@ -216,6 +230,8 @@ function UsersPage() {
       }}
     >
       <TableCell>{(page - 1) * rowsPerPage + filteredUsers.indexOf(user) + 1}</TableCell>
+      <TableCell>{user.id}</TableCell>
+      <TableCell>{user.account_name}</TableCell>
       <TableCell>
         <Box display="flex" alignItems="center" gap={1}>
           {user.email}
@@ -230,91 +246,44 @@ function UsersPage() {
           </IconButton>
         </Box>
       </TableCell>
-      <TableCell>{user.username}</TableCell>
-      <TableCell>{user.fullName}</TableCell>
-      <TableCell>
-        <Box display="flex" alignItems="center" gap={1}>
-          {user.phone}
-          <IconButton
-            size="small"
-            onClick={() => {
-              navigator.clipboard.writeText(user.phone || "");
-              message.success(`Đã sao chép số điện thoại: ${user.phone}`);
-            }}
-          >
-            <IconCopy size={16} className="text-blue-500" />
-          </IconButton>
-        </Box>
-      </TableCell>
-      <TableCell>
-        <Box display="flex" alignItems="center" gap={1}>
-          {user.invitationCode}
-          {user.invitationCode && (
-            <IconButton
-              size="small"
-              onClick={() => {
-                navigator.clipboard.writeText(user.invitationCode || "");
-                message.success(`Đã sao chép mã giới thiệu: ${user.invitationCode}`);
-              }}
-            >
-              <IconCopy size={16} className="text-blue-500" />
-            </IconButton>
-          )}
-        </Box>
-      </TableCell>
+      <TableCell>{user.invite_code_id}</TableCell>
+      <TableCell>{user.my_invite_code_id}</TableCell>
+      <TableCell>{user.language}</TableCell>
+      <TableCell>{user.vip_tier}</TableCell>
+      <TableCell>{user.total_points}</TableCell>
+      <TableCell>{user.current_level}</TableCell>
+      <TableCell>{user.notification_enabled ? '✔️' : ''}</TableCell>
+      <TableCell>{user.voice_enabled ? '✔️' : ''}</TableCell>
       <TableCell>
         <Chip
-          label={
-            user.shopName === "admin2" ? "Xuất nhập khoản" :
-            user.role === "supper_admin" ? "Super Admin" :
-            user.role === "admin" ? "Admin" :
-              user.role === "shop" ? "Người bán" :
-                "Khách ảo"
-          }
-          color={
-            user.shopName === "admin2" ? "info" :
-            user.role === "supper_admin" ? "secondary" :
-            user.role === "admin" ? "primary" :
-              user.role === "shop" ? "warning" :
-                "success"
-          }
+          label={user.is_active ? "Đang hoạt động" : "Đã khóa"}
+          color={user.is_active ? "success" : "error"}
           size="small"
           variant="filled"
-          className={user.role === "supper_admin" ? "!text-white" : ""}
         />
       </TableCell>
       <TableCell>
-        {user.role === "shop" ? (
-          <Chip
-            label={
-              user.shopStatus === "PENDING"
-                ? "Chờ duyệt"
-                : user.shopStatus === "SUSPENDED"
-                  ? "Đã đóng băng"
-                  : user.isActive
-                    ? "Đang hoạt động"
-                    : "Đã khóa"
-            }
-            color={
-              user.shopStatus === "PENDING"
-                ? "warning"
-                : user.shopStatus === "SUSPENDED"
-                  ? "error"
-                  : user.isActive
-                    ? "success"
-                    : "error"
-            }
-            size="small"
-            variant="filled"
-          />
-        ) : (
-          <Chip
-            label={user.isActive ? "Đang hoạt động" : "Đã khóa"}
-            color={user.isActive ? "success" : "error"}
-            size="small"
-            variant="filled"
-          />
-        )}
+        <Chip
+          label={user.is_banned ? "Banned" : "Không"}
+          color={user.is_banned ? "error" : "success"}
+          size="small"
+          variant="filled"
+        />
+      </TableCell>
+      <TableCell>{user.login_count}</TableCell>
+      <TableCell>{dayjs(user.created_at).format('DD/MM/YYYY HH:mm:ss')}</TableCell>
+      <TableCell>{dayjs(user.updated_at).format('DD/MM/YYYY HH:mm:ss')}</TableCell>
+      <TableCell>
+        <IconButton
+          size="small"
+          onClick={() => {
+            navigator.clipboard.writeText(JSON.stringify(user.used_invite_code, null, 2));
+            message.success(`Đã sao chép mã mời đã dùng`);
+          }}
+        >
+          <IconCopy size={16} className="text-blue-500" />
+        </IconButton>
+        <span style={{ fontSize: 10, color: '#888' }}>{user.used_invite_code?.code || ''}</span>
       </TableCell>
       <TableCell>
         <Box className="flex items-center justify-center gap-4">
@@ -324,7 +293,6 @@ function UsersPage() {
           >
             <IconDotsVertical size={18} />
           </IconButton>
-
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl) && menuUserId === user.id}
@@ -334,24 +302,6 @@ function UsersPage() {
             }}
           >
             <MenuItem onClick={() => {
-              handleBalanceDialogOpen(user.id, 'deposit');
-              handleMenuClose();
-            }}>
-              <Box className="flex items-center gap-2">
-                <IconWallet size={16} className="text-green-400" />
-                <span>Nạp tiền</span>
-              </Box>
-            </MenuItem>
-            <MenuItem onClick={() => {
-              handleBalanceDialogOpen(user.id, 'withdraw');
-              handleMenuClose();
-            }}>
-              <Box className="flex items-center gap-2">
-                <IconWallet size={16} className="text-orange-400" />
-                <span>Rút tiền</span>
-              </Box>
-            </MenuItem>
-            <MenuItem onClick={() => {
               handleView(user.id);
               handleMenuClose();
             }}>
@@ -360,27 +310,15 @@ function UsersPage() {
                 <span>Xem chi tiết</span>
               </Box>
             </MenuItem>
-            {user.role === "shop" && (
-              <MenuItem onClick={() => {
-                handleOpenChat(user.id);
-                handleMenuClose();
-              }}>
-                <Box className="flex items-center gap-2">
-                  <IconMessage size={16} className="text-green-400" />
-                  <span>Nhắn tin</span>
-                </Box>
-              </MenuItem>
-            )}
-            {user.role === "shop" && (
-              <MenuItem onClick={() => {
-                handleToggleFreeze(user.id);
-              }}>
-                <Box className="flex items-center gap-2">
-                  <IconWallet size={16} className={user.shopStatus === "SUSPENDED" ? "text-green-400" : "text-red-400"} />
-                  <span>{user.shopStatus === "SUSPENDED" ? "Bỏ đóng băng shop" : "Đóng băng shop"}</span>
-                </Box>
-              </MenuItem>
-            )}
+            <MenuItem onClick={() => {
+              handleOpenChat(user.id);
+              handleMenuClose();
+            }}>
+              <Box className="flex items-center gap-2">
+                <IconMessage size={16} className="text-green-400" />
+                <span>Nhắn tin</span>
+              </Box>
+            </MenuItem>
             <MenuItem onClick={() => {
               openDeleteDialog(user.id);
               handleMenuClose();
@@ -388,6 +326,32 @@ function UsersPage() {
               <Box className="flex items-center gap-2">
                 <IconTrash size={16} className="text-red-400" />
                 <span>Xóa</span>
+              </Box>
+            </MenuItem>
+            <MenuItem onClick={() => {
+              handleToggleFreeze(user.id);
+              handleMenuClose();
+            }}>
+              <Box className="flex items-center gap-2">
+                {user.is_active ? (
+                  <IconEye size={16} className="text-red-400" />
+                ) : (
+                  <IconEye size={16} className="text-green-400" />
+                )}
+                <span>{user.is_active ? "Khóa" : "Mở khóa"}</span>
+              </Box>
+            </MenuItem>
+            <MenuItem onClick={() => {
+              handleToggleBan(user.id);
+              handleMenuClose();
+            }}>
+              <Box className="flex items-center gap-2">
+                {user.is_banned ? (
+                  <IconEye size={16} className="text-red-400" />
+                ) : (
+                  <IconEye size={16} className="text-green-400" />
+                )}
+                <span>{user.is_banned ? "Mở khóa" : "Khóa"}</span>
               </Box>
             </MenuItem>
           </Menu>
@@ -551,59 +515,10 @@ function UsersPage() {
       <ChatDialog
         open={chatDialogOpen}
         onClose={() => setChatDialogOpen(false)}
-        userId={selectedUserId}
-        allUsers={allUsers?.data?.data || []}
+        userId={selectedUserId ? selectedUserId.toString() : null}
+        allUsers={allUsers?.users || []}
         shop={selectedShop}
       />
-
-      <Dialog
-        open={balanceDialogOpen}
-        onClose={handleBalanceDialogClose}
-        PaperProps={{
-          className: "!rounded-[6px] shadow-xl",
-        }}
-      >
-        <DialogTitle fontSize={18}>
-          {balanceActionType === 'deposit' ? 'Nạp tiền' : 'Rút tiền'}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            size="small"
-            type="number"
-            label="Số tiền"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            sx={{ mt: 2 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">USD</InputAdornment>,
-            }}
-          />
-        </DialogContent>
-        <DialogActions className="!p-4 !pb-6">
-          <Button
-            variant="outlined"
-            onClick={handleBalanceDialogClose}
-          >
-            Hủy bỏ
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleBalanceUpdate}
-            className="text-white transition-colors !bg-main-golden-orange !border-main-golden-orange"
-            disabled={updateUserMutation.isPending}
-          >
-            {updateUserMutation.isPending ? (
-              <div className="flex items-center gap-2 text-white">
-                <CircularProgress size={16} className="text-white" />
-                Đang xử lý...
-              </div>
-            ) : (
-              balanceActionType === 'deposit' ? <span className="text-white">Nạp tiền</span> : <span className="text-white">Rút tiền</span>
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   )
 }
