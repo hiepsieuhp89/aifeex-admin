@@ -18,6 +18,13 @@ import {
   IconSettings,
   IconShoppingCart,
   IconTicket,
+  IconRobotFace,
+  IconBlockquote,
+  IconWallet,
+  IconChartBar,
+  IconCurrencyBitcoin,
+  IconUserStar,
+  IconCoin
 } from "@tabler/icons-react"
 import { useGetAdminProfile } from "@/hooks/admin-auth";
 
@@ -46,27 +53,83 @@ const Menuitems = [
   },
   {
     id: generateUniqueId(),
-    title: "Quản lý POS",
-    icon: IconPrinter,
-    href: "/admin/pos",
-  },
-  {
-    id: generateUniqueId(),
     title: "Quản lý người dùng",
     icon: IconUsers,
     href: "/admin/users",
   },
   {
     id: generateUniqueId(),
-    title: "Quản lý cửa hàng",
-    icon: IconBuildingWarehouse,
-    href: "/admin/shops",
+    title: "Quản lý đại lý",
+    icon: IconUserStar,
+    href: "javascript:void(0)",
+    children: [
+      {
+        id: generateUniqueId(),
+        title: "Danh sách đại lý",
+        href: "/admin/agents",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Thống kê hệ thống",
+        href: "/admin/agents/statistics",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Tạo mã mời",
+        href: "/admin/agents/invite-codes",
+      },
+    ],
   },
   {
     id: generateUniqueId(),
-    title: "Quản lý đơn hàng",
-    icon: IconShoppingCart,
-    href: "/admin/orders",
+    title: "Quản lý Blockchain",
+    icon: IconCurrencyBitcoin,
+    href: "javascript:void(0)",
+    children: [
+      {
+        id: generateUniqueId(),
+        title: "Cài đặt Blockchain",
+        href: "/admin/blockchain/settings",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Thống kê Blockchain",
+        href: "/admin/blockchain/statistics",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Đồng bộ thủ công",
+        href: "/admin/blockchain/sync",
+      },
+    ],
+  },
+  {
+    id: generateUniqueId(),
+    title: "Quản lý ví",
+    icon: IconWallet,
+    href: "javascript:void(0)",
+    children: [
+      {
+        id: generateUniqueId(),
+        title: "Ví chính",
+        href: "/admin/wallet/master",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Tổng ví",
+        href: "/admin/wallet/total",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Ví người dùng",
+        href: "/admin/wallet/users",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Xử lý rút tiền",
+        href: "/admin/wallet/withdrawals",
+      },
+    ],
   },
   {
     id: generateUniqueId(),
@@ -88,39 +151,9 @@ const Menuitems = [
   },
   {
     id: generateUniqueId(),
-    title: "Quản lý đánh giá",
-    icon: IconLayoutGridAdd,
-    href: "/admin/fake-reviews",
-  },
-  {
-    id: generateUniqueId(),
-    title: "Quản lý danh mục",
-    icon: IconLayoutGridAdd,
-    href: "/admin/categories",
-  },
-  {
-    id: generateUniqueId(),
     title: "Quản lý nạp/rút",
     icon: IconTransactionDollar,
     href: "/transaction/history",
-  },
-  {
-    id: generateUniqueId(),
-    title: "Quản lý mã mời",
-    icon: IconTicket,
-    href: "/admin/invitation-codes",
-  },
-  {
-    id: generateUniqueId(),
-    title: "Quản lý gói bán hàng",
-    icon: IconPackages,
-    href: "/admin/seller-packages",
-  },
-  {
-    id: generateUniqueId(),
-    title: "Quản lý gói quảng bá",
-    icon: IconBrandTelegram,
-    href: "/admin/spread-packages",
   },
   {
     id: generateUniqueId(),
@@ -130,11 +163,6 @@ const Menuitems = [
     children: [
       {
         id: generateUniqueId(),
-        title: "Phê duyệt cửa hàng mới",
-        href: "/admin/notifications/store-approval",
-      },
-      {
-        id: generateUniqueId(),
         title: "Lệnh nạp",
         href: "/admin/notifications/deposit-orders",
       },
@@ -142,21 +170,6 @@ const Menuitems = [
         id: generateUniqueId(),
         title: "Lệnh rút",
         href: "/admin/notifications/withdraw-orders",
-      },
-      {
-        id: generateUniqueId(),
-        title: "Tin nhắn với người bán",
-        href: "/admin/notifications/seller-messages",
-      },
-      {
-        id: generateUniqueId(),
-        title: "Tin nhắn mail",
-        href: "/admin/notifications/email-messages",
-      },
-      {
-        id: generateUniqueId(),
-        title: "Tìm kiếm của người dùng",
-        href: "/admin/notifications/user-searches",
       },
     ],
   },
@@ -216,9 +229,9 @@ const filterMenuItems = (items: any[], role?: string) => {
   if (userRole === "super_admin") return items;
 
   if (userRole === "admin") {
-      return items.filter(item => 
-        ["Quản lý người dùng", "Quản lý nạp/rút", "Thông báo"].includes(item.title)
-      );
+    return items.filter(item =>
+      ["Quản lý người dùng", "Quản lý đại lý", "Quản lý Blockchain", "Quản lý ví", "Quản lý nạp/rút", "Thông báo"].includes(item.title)
+    );
   }
 
   return items;
@@ -228,7 +241,7 @@ const SidebarItems = ({ toggleMobileSidebar }: any) => {
   const pathname = usePathname();
   const pathDirect = pathname;
   const { data: profileData } = useGetAdminProfile()
-  
+
   const filteredMenuItems = filterMenuItems(
     Menuitems,
     profileData?.role,

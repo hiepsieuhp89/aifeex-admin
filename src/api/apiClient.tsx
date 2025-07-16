@@ -46,10 +46,10 @@ instance.interceptors.response.use(
   async (err) => {
 
     if (err.response) {
-      if (err.response.status === 403 || err.response.status === 401) {
-        logout();
-        return Promise.reject(err);
-      }
+      // if (err.response.status === 403 || err.response.status === 401) {
+      //   logout();
+      //   return Promise.reject(err);
+      // }
 
     }
     return Promise.reject(err);
