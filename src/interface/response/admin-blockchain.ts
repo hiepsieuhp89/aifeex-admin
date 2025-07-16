@@ -53,4 +53,31 @@ export interface IManualBlockchainSyncResponse {
     sync_duration: number;
     last_processed_block: number;
   };
+}
+
+export interface IBlockchainTransaction {
+  id: number;
+  user_id: number;
+  network: string;
+  type: string; // deposit|withdrawal
+  status: string; // pending|confirmed|failed
+  tx_hash: string;
+  amount: string;
+  fee: string;
+  from_address: string;
+  to_address: string;
+  block_number: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IGetBlockchainTransactionsResponse {
+  transactions: IBlockchainTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface IGetBlockchainTransactionDetailResponse {
+  transaction: IBlockchainTransaction;
 } 

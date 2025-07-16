@@ -101,6 +101,12 @@ const Menuitems = [
         title: "Đồng bộ thủ công",
         href: "/admin/blockchain/sync",
       },
+      // Thêm mới mục danh sách giao dịch
+      {
+        id: generateUniqueId(),
+        title: "Danh sách giao dịch",
+        href: "/admin/blockchain/transactions",
+      },
     ],
   },
   {
@@ -126,8 +132,18 @@ const Menuitems = [
       },
       {
         id: generateUniqueId(),
-        title: "Xử lý rút tiền",
+        title: "Yêu cầu rút tiền",
         href: "/admin/wallet/withdrawals",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Rút tiền đang chờ",
+        href: "/admin/wallet/withdrawals/pending",
+      },
+      {
+        id: generateUniqueId(),
+        title: "Xử lý rút tiền hàng loạt",
+        href: "/admin/wallet/withdrawals/process",
       },
     ],
   },

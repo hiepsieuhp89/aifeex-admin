@@ -3,13 +3,10 @@ import type { PaginationProps, TableProps } from 'antd';
 import { Button, Empty, Table } from 'antd';
 import type { SorterResult } from 'antd/lib/table/interface';
 import type { HTMLAttributes, TdHTMLAttributes } from 'react';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styles from './styles.module.scss';
-// import { errorMessage } from "@/utils";
 import { DeleteOutlined } from '@ant-design/icons';
-// import ModalAction from "../ModalConfirmDelete/ModalAction";
-// import { useDeleteUserSelect } from "@/hooks/user";
-// import MessageClientContext from "@/provider/MessageProvider";
+
 interface ITable {
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
@@ -129,27 +126,27 @@ const TableDeleteDataComponent = ({
           isPageHide
             ? false
             : {
-                onChange,
-                total,
-                current: pageCurrent,
-                pageSize,
-                showSizeChanger: true,
-                showTotal: (total, range) => (
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div className='text-gray-500'>{`${range[0]}-${range[1]} of ${total} items`}</div>
-                  </div>
-                ),
-                pageSizeOptions: showPageSizeOptions
-                  ? ['10', '20', '50']
-                  : undefined,
-                size: 'default',
-              }
+              onChange,
+              total,
+              current: pageCurrent,
+              pageSize,
+              showSizeChanger: true,
+              showTotal: (total, range) => (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div className='text-gray-500'>{`${range[0]}-${range[1]} of ${total} items`}</div>
+                </div>
+              ),
+              pageSizeOptions: showPageSizeOptions
+                ? ['10', '20', '50']
+                : undefined,
+              size: 'default',
+            }
         }
         className={`${styles.tableCustom} whitespace-nowrap`}
         columns={columns}

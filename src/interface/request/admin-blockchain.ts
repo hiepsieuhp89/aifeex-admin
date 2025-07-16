@@ -17,4 +17,15 @@ export interface IManualBlockchainSyncRequest {
   start_block: number;
   sync_reason: string;
   sync_type: string;
+}
+
+export interface IGetBlockchainTransactionsRequest {
+  page?: number;
+  limit?: number;
+  user_id?: number;
+  network?: string; // ethereum|bsc|bitcoin|tron
+  status?: string; // pending|confirmed|failed
+  type?: string; // deposit|withdrawal
+  start_date?: string; // YYYY-MM-DD
+  end_date?: string; // YYYY-MM-DD
 } 

@@ -7,11 +7,18 @@ import {
   IGetWalletUsersResponse,
   IGetWalletUserByIdResponse,
   IWithdrawWalletResponse,
+  IGetWithdrawalRequestsResponse,
+  IGetWithdrawalRequestDetailResponse,
+  IApproveOrRejectWithdrawalResponse,
+  IGetPendingWithdrawalsResponse,
 } from "@/interface/response/admin-wallet";
 import {
   ICollectWalletRequest,
   IGetWalletUsersRequest,
   IWithdrawWalletRequest,
+  IGetWithdrawalRequestsRequest,
+  IApproveOrRejectWithdrawalRequest,
+  IGetPendingWithdrawalsRequest,
 } from "@/interface/request/admin-wallet";
 import { AdminWalletEndPoint } from "./admin-wallet";
 
@@ -50,5 +57,54 @@ export const getWalletUserById = async (id: number): Promise<IGetWalletUserByIdR
 
 export const withdrawWallet = async (payload: IWithdrawWalletRequest): Promise<IWithdrawWalletResponse> => {
   const response = await apiClient.post({ url: AdminWalletEndPoint.WITHDRAW, data: payload });
+  return response.data;
+};
+
+export const getWithdrawalRequests = async (
+  params?: IGetWithdrawalRequestsRequest
+): Promise<IGetWithdrawalRequestsResponse> => {
+  const response = await apiClient.get({
+    url: AdminWalletEndPoint.WITHDRAWAL_REQUESTS,
+    params,
+  });
+  return response.data;
+};
+
+export const getWithdrawalRequestDetail = async (
+  id: number
+): Promise<IGetWithdrawalRequestDetailResponse> => {
+  const response = await apiClient.get({
+    url: AdminWalletEndPoint.WITHDRAWAL_REQUEST_DETAIL(id),
+  });
+  return response.data;
+};
+
+export const approveWithdrawal = async (
+  payload: IApproveOrRejectWithdrawalRequest
+): Promise<IApproveOrRejectWithdrawalResponse> => {
+  const response = await apiClient.post({
+    url: AdminWalletEndPoint.APPROVE_WITHDRAWAL,
+    data: payload,
+  });
+  return response.data;
+};
+
+export const rejectWithdrawal = async (
+  payload: IApproveOrRejectWithdrawalRequest
+): Promise<IApproveOrRejectWithdrawalResponse> => {
+  const response = await apiClient.post({
+    url: AdminWalletEndPoint.REJECT_WITHDRAWAL,
+    data: payload,
+  });
+  return response.data;
+};
+
+export const getPendingWithdrawals = async (
+  params?: IGetPendingWithdrawalsRequest
+): Promise<IGetPendingWithdrawalsResponse> => {
+  const response = await apiClient.get({
+    url: AdminWalletEndPoint.PENDING_WITHDRAWALS,
+    params,
+  });
   return response.data;
 }; 

@@ -14,6 +14,11 @@ import {
   getWalletUsers,
   getWalletUserById,
   withdrawWallet,
+  getWithdrawalRequests,
+  getWithdrawalRequestDetail,
+  approveWithdrawal,
+  rejectWithdrawal,
+  getPendingWithdrawals,
 } from "@/api/services/admin-wallet.service";
 
 import {
@@ -24,11 +29,18 @@ import {
   IGetWalletUsersResponse,
   IGetWalletUserByIdResponse,
   IWithdrawWalletResponse,
+  IGetWithdrawalRequestsResponse,
+  IGetWithdrawalRequestDetailResponse,
+  IApproveOrRejectWithdrawalResponse,
+  IGetPendingWithdrawalsResponse,
 } from "@/interface/response/admin-wallet";
 import {
   ICollectWalletRequest,
   IGetWalletUsersRequest,
   IWithdrawWalletRequest,
+  IGetWithdrawalRequestsRequest,
+  IApproveOrRejectWithdrawalRequest,
+  IGetPendingWithdrawalsRequest,
 } from "@/interface/request/admin-wallet";
 
 const ADMIN_WALLET_KEYS = {
@@ -36,6 +48,9 @@ const ADMIN_WALLET_KEYS = {
   TOTAL_WALLET: "totalWallet",
   WALLET_USERS: "walletUsers",
   WALLET_USER_BY_ID: "walletUserById",
+  WITHDRAWAL_REQUESTS: "withdrawalRequests",
+  WITHDRAWAL_REQUEST_DETAIL: "withdrawalRequestDetail",
+  PENDING_WITHDRAWALS: "pendingWithdrawals",
 };
 
 export const useCollectWallet = (): UseMutationResult<
@@ -113,5 +128,63 @@ export const useWithdrawWallet = (): UseMutationResult<
       queryClient.invalidateQueries({ queryKey: [ADMIN_WALLET_KEYS.WALLET_USERS] });
       // Invalidate specific user wallet if applicable
     },
+  });
+};
+
+export const useGetWithdrawalRequests = (
+  params?: IGetWithdrawalRequestsRequest
+): UseQueryResult<IGetWithdrawalRequestsResponse> => {
+  return useQuery({
+    queryKey: [ADMIN_WALLET_KEYS.WITHDRAWAL_REQUESTS, params],
+    queryFn: () => getWithdrawalRequests(params),
+  });
+};
+
+export const useGetWithdrawalRequestDetail = (
+  id: number
+): UseQueryResult<IGetWithdrawalRequestDetailResponse> => {
+  return useQuery({
+    queryKey: [ADMIN_WALLET_KEYS.WITHDRAWAL_REQUEST_DETAIL, id],
+    queryFn: () => getWithdrawalRequestDetail(id),
+    enabled: !!id,
+  });
+};
+
+export const useApproveWithdrawal = (): UseMutationResult<
+  IApproveOrRejectWithdrawalResponse,
+  Error,
+  IApproveOrRejectWithdrawalRequest
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: approveWithdrawal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_WALLET_KEYS.PENDING_WITHDRAWALS] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_WALLET_KEYS.WITHDRAWAL_REQUESTS] });
+    },
+  });
+};
+
+export const useRejectWithdrawal = (): UseMutationResult<
+  IApproveOrRejectWithdrawalResponse,
+  Error,
+  IApproveOrRejectWithdrawalRequest
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: rejectWithdrawal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_WALLET_KEYS.PENDING_WITHDRAWALS] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_WALLET_KEYS.WITHDRAWAL_REQUESTS] });
+    },
+  });
+};
+
+export const useGetPendingWithdrawals = (
+  params?: IGetPendingWithdrawalsRequest
+): UseQueryResult<IGetPendingWithdrawalsResponse> => {
+  return useQuery({
+    queryKey: [ADMIN_WALLET_KEYS.PENDING_WITHDRAWALS, params],
+    queryFn: () => getPendingWithdrawals(params),
   });
 }; 

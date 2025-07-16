@@ -11,6 +11,8 @@ import {
   updateBlockchainSettings,
   getBlockchainStatistics,
   manualBlockchainSync,
+  getBlockchainTransactions,
+  getBlockchainTransactionDetail,
 } from "@/api/services/admin-blockchain.service";
 
 import {
@@ -18,16 +20,21 @@ import {
   IUpdateBlockchainSettingsResponse,
   IGetBlockchainStatisticsResponse,
   IManualBlockchainSyncResponse,
+  IGetBlockchainTransactionsResponse,
+  IGetBlockchainTransactionDetailResponse,
 } from "@/interface/response/admin-blockchain";
 import {
   IUpdateBlockchainSettingsRequest,
   IGetBlockchainStatisticsRequest,
   IManualBlockchainSyncRequest,
+  IGetBlockchainTransactionsRequest,
 } from "@/interface/request/admin-blockchain";
 
 const ADMIN_BLOCKCHAIN_KEYS = {
   SETTINGS: "blockchainSettings",
   STATISTICS: "blockchainStatistics",
+  TRANSACTIONS: "blockchainTransactions",
+  TRANSACTION_DETAIL: "blockchainTransactionDetail",
 };
 
 export const useGetBlockchainSettings = (): UseQueryResult<IGetBlockchainSettingsResponse> => {
@@ -72,5 +79,24 @@ export const useManualBlockchainSync = (): UseMutationResult<
       queryClient.invalidateQueries({ queryKey: [ADMIN_BLOCKCHAIN_KEYS.STATISTICS] });
       // Depending on what a manual sync affects, you might want to invalidate other relevant queries.
     },
+  });
+};
+
+export const useGetBlockchainTransactions = (
+  params?: IGetBlockchainTransactionsRequest
+): UseQueryResult<IGetBlockchainTransactionsResponse> => {
+  return useQuery({
+    queryKey: [ADMIN_BLOCKCHAIN_KEYS.TRANSACTIONS, params],
+    queryFn: () => getBlockchainTransactions(params),
+  });
+};
+
+export const useGetBlockchainTransactionDetail = (
+  id: number
+): UseQueryResult<IGetBlockchainTransactionDetailResponse> => {
+  return useQuery({
+    queryKey: [ADMIN_BLOCKCHAIN_KEYS.TRANSACTION_DETAIL, id],
+    queryFn: () => getBlockchainTransactionDetail(id),
+    enabled: !!id,
   });
 }; 

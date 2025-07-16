@@ -20,4 +20,24 @@ export interface IWithdrawWalletRequest {
   reason: string;
   to_address: string;
   token_symbol: string;
+}
+
+export interface IGetWithdrawalRequestsRequest {
+  page?: number;
+  limit?: number;
+  user_id?: number;
+  network?: string;
+  status?: string; // pending|approved|rejected|completed|failed
+  start_date?: string; // YYYY-MM-DD
+  end_date?: string; // YYYY-MM-DD
+}
+
+export interface IApproveOrRejectWithdrawalRequest {
+  note: string;
+  withdrawal_id: number;
+}
+
+export interface IGetPendingWithdrawalsRequest {
+  page?: number;
+  limit?: number;
 } 
